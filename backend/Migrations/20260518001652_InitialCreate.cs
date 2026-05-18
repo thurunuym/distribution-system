@@ -1,0 +1,175 @@
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace DistributionApi.Migrations
+{
+    /// <inheritdoc />
+    public partial class InitialCreate : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "Routes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Routes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Shops",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
+                    Address = table.Column<string>(type: "TEXT", nullable: true),
+                    RouteId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Shops", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Shops_Routes_RouteId",
+                        column: x => x.RouteId,
+                        principalTable: "Routes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Invoices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Number = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "numeric(12,2)", precision: 18, scale: 2, nullable: false),
+                    Paid = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
+                    Status = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    Remarks = table.Column<string>(type: "TEXT", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Invoices_Shops_ShopId",
+                        column: x => x.ShopId,
+                        principalTable: "Shops",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Cheques",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    InvoiceId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ChequeNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Bank = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Amount = table.Column<decimal>(type: "numeric(12,2)", precision: 18, scale: 2, nullable: false),
+                    DateReceived = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    DueDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
+                    ClearedDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
+                    Status = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    ReturnReason = table.Column<string>(type: "TEXT", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cheques", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cheques_Invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    InvoiceId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(12,2)", precision: 18, scale: 2, nullable: false),
+                    Type = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    Date = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    ChequeId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payments_Cheques_ChequeId",
+                        column: x => x.ChequeId,
+                        principalTable: "Cheques",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Payments_Invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cheques_InvoiceId",
+                table: "Cheques",
+                column: "InvoiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invoices_ShopId",
+                table: "Invoices",
+                column: "ShopId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_ChequeId",
+                table: "Payments",
+                column: "ChequeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_InvoiceId",
+                table: "Payments",
+                column: "InvoiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Shops_RouteId",
+                table: "Shops",
+                column: "RouteId");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "Payments");
+
+            migrationBuilder.DropTable(
+                name: "Cheques");
+
+            migrationBuilder.DropTable(
+                name: "Invoices");
+
+            migrationBuilder.DropTable(
+                name: "Shops");
+
+            migrationBuilder.DropTable(
+                name: "Routes");
+        }
+    }
+}

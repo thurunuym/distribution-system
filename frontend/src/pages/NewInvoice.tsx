@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { InvoiceCreateSchema } from '../backend/validators/validators.ts';
+import { InvoiceCreateSchema } from '../lib/validators.ts';
 import api from '../lib/axios.ts';
 import { formatCurrency, cn } from '../lib/utils.ts';
 import { Loader2 } from 'lucide-react';
