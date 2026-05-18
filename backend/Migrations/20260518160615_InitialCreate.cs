@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -15,9 +16,9 @@ namespace DistributionApi.Migrations
                 name: "Routes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,11 +29,11 @@ namespace DistributionApi.Migrations
                 name: "Shops",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: true),
-                    RouteId = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: true),
+                    RouteId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -49,16 +50,16 @@ namespace DistributionApi.Migrations
                 name: "Invoices",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Number = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    ShopId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Number = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    ShopId = table.Column<int>(type: "integer", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "numeric(12,2)", precision: 18, scale: 2, nullable: false),
                     Paid = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
-                    Status = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
-                    Remarks = table.Column<string>(type: "TEXT", nullable: true),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    Status = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Remarks = table.Column<string>(type: "text", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,18 +76,18 @@ namespace DistributionApi.Migrations
                 name: "Cheques",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    InvoiceId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ChequeNo = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Bank = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InvoiceId = table.Column<int>(type: "integer", nullable: false),
+                    ChequeNo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Bank = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Amount = table.Column<decimal>(type: "numeric(12,2)", precision: 18, scale: 2, nullable: false),
-                    DateReceived = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    DueDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    ClearedDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    Status = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
-                    ReturnReason = table.Column<string>(type: "TEXT", nullable: true),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    DateReceived = table.Column<DateOnly>(type: "date", nullable: false),
+                    DueDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    ClearedDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    Status = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    ReturnReason = table.Column<string>(type: "text", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,13 +104,13 @@ namespace DistributionApi.Migrations
                 name: "Payments",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    InvoiceId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    InvoiceId = table.Column<int>(type: "integer", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric(12,2)", precision: 18, scale: 2, nullable: false),
-                    Type = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
-                    Date = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    ChequeId = table.Column<int>(type: "INTEGER", nullable: true)
+                    Type = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    ChequeId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {

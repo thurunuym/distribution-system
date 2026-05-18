@@ -25,6 +25,6 @@ public class RoutesController(AppDbContext db) : ControllerBase
         var route = new Route { Name = req.Name };
         db.Routes.Add(route);
         await db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetAll), new RouteResponse(route.Id, route.Name));
+return CreatedAtAction(nameof(GetAll), null, new RouteResponse(route.Id, route.Name));
     }
 }
