@@ -19,12 +19,13 @@ public class RoutesController(AppDbContext db) : ControllerBase
 
     /// <summary>Creates a new route.</summary>
     [HttpPost]
+    [HttpPost("/api/route")]
     public async Task<ActionResult<RouteResponse>> Create([FromBody] CreateRouteRequest req)
     {
         // TODO: add auth guard — only admin can create routes
         var route = new Route { Name = req.Name };
         db.Routes.Add(route);
         await db.SaveChangesAsync();
-return CreatedAtAction(nameof(GetAll), null, new RouteResponse(route.Id, route.Name));
+        return CreatedAtAction(nameof(GetAll), null, new RouteResponse(route.Id, route.Name));
     }
 }

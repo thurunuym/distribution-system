@@ -13,7 +13,10 @@ export default function RoutesPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (name: string) => api.post('/routes', { name }),
+    mutationFn: async (name: string) => {
+      const trimmedName = name.trim();
+      return api.post('/routes', { name: trimmedName });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['routes'] });
       setNewRoute('');
@@ -35,7 +38,7 @@ export default function RoutesPage() {
           />
           <button
             onClick={() => mutation.mutate(newRoute)}
-            disabled={!newRoute || mutation.isPending}
+            disabled={!newRoute.trim() || mutation.isPending}
             className="px-6 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 disabled:opacity-50 inline-flex items-center"
           >
             {mutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
