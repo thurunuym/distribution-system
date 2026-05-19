@@ -49,6 +49,7 @@ The API will be available at `http://localhost:5000` or `http://localhost:5001` 
 - `PUT /api/cheques/{id}` - Update cheque status
 
 ### Dashboard
+- `GET /api/dashboard/summary?date=` - Get dashboard summary statistics for a specific date
 - `GET /api/dashboard/cheques-due?date=` - Get cheques due on a specific date
 
 ### Credits

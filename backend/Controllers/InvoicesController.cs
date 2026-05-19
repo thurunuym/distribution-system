@@ -32,7 +32,7 @@ public class InvoicesController(InvoiceService svc, AppDbContext db) : Controlle
     public async Task<InvoiceSummaryResponse> GetSummary([FromQuery] DateOnly? date) =>
         await svc.GetSummaryAsync(date ?? DateOnly.FromDateTime(DateTime.Today));
 
-    /// <summary>Creates an invoice with payments and optional cheque atomically.</summary>
+    /// <summary>Creates an invoice with payments and optional cheque entries atomically.</summary>
     [HttpPost]
     public async Task<ActionResult<InvoiceResponse>> Create([FromBody] CreateInvoiceRequest req)
     {

@@ -33,7 +33,7 @@ function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex space-x-8">
             <div className="flex-shrink-0 flex items-center font-bold text-xl text-blue-600">
-              DistroTrack
+              KELANI_DISTRIBUTION
             </div>
             <div className="hidden sm:flex sm:space-x-4">
               {navItems.map((item) => {

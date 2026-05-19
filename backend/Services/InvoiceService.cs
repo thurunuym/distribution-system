@@ -27,38 +27,41 @@ public class InvoiceService(AppDbContext db)
         db.Invoices.Add(invoice);
         await db.SaveChangesAsync();
 
-        Cheque? chequeEntity = null;
-        var chequePayment = req.Payments.FirstOrDefault(p => p.Type == "cheque");
-
-        if (chequePayment != null && req.Cheque != null)
+        foreach (var payment in req.Payments)
         {
-            chequeEntity = new Cheque
+            int? chequeId = null;
+
+            if (payment.Type == "cheque")
+            {
+                if (payment.Cheque is null)
+                    throw new ArgumentException("Cheque details required for cheque payment.");
+
+                var cheque = new Cheque
+                {
+                    InvoiceId = invoice.Id,
+                    ChequeNo = payment.Cheque.ChequeNo,
+                    Bank = payment.Cheque.Bank,
+                    Amount = payment.Cheque.Amount,
+                    DateReceived = payment.Cheque.DateReceived,
+                    DueDate = payment.Cheque.DueDate,
+                    Status = "pending",
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
+                db.Cheques.Add(cheque);
+                await db.SaveChangesAsync();
+                chequeId = cheque.Id;
+            }
+
+            db.Payments.Add(new Payment
             {
                 InvoiceId = invoice.Id,
-                ChequeNo = req.Cheque.ChequeNo,
-                Bank = req.Cheque.Bank,
-                Amount = req.Cheque.Amount,
-                DateReceived = req.Cheque.DateReceived,
-                DueDate = req.Cheque.DueDate,
-                Status = "pending",
-                UpdatedAt = DateTimeOffset.UtcNow
-            };
-            db.Cheques.Add(chequeEntity);
-            await db.SaveChangesAsync();
-        }
-
-        foreach (var p in req.Payments)
-        {
-            var payment = new Payment
-            {
-                InvoiceId = invoice.Id,
-                Amount = p.Amount,
-                Type = p.Type,
+                Amount = payment.Amount,
+                Type = payment.Type,
                 Date = req.Date,
-                ChequeId = p.Type == "cheque" ? chequeEntity?.Id : null
-            };
-            db.Payments.Add(payment);
+                ChequeId = chequeId
+            });
         }
+
         await db.SaveChangesAsync();
         await tx.CommitAsync();
 

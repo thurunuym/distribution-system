@@ -12,7 +12,7 @@ export default function Dashboard() {
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['summary', selectedDate],
     queryFn: async () => {
-      const res = await api.get(`/invoices/summary?date=${selectedDate}`);
+      const res = await api.get(`/dashboard/summary?date=${selectedDate}`);
       return res.data;
     }
   });
