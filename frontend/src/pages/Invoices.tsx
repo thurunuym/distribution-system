@@ -26,48 +26,6 @@ export default function Invoices() {
     queryFn: async () => (await api.get('/shops')).data
   });
 
-  const { data: credits } = useQuery({
-  // 1. Keep 'credits' in the cache key so it doesn't collide with the general invoice list
-  queryKey: ['credits', routeId, agingMonths, specificDate], 
-  queryFn: async () => {
-    const params = new URLSearchParams();
-    
-    // 2. Force the status filter to always request 'credit' records
-    params.append('status', 'credit'); 
-    
-    // 3. Fall back to date handling if specific mapping is targeted
-    if (specificDate) params.append('date', specificDate);
-    
-    // 4. Request from the valid /invoices route path
-    const res = await api.get(`/invoices?${params.toString()}`);
-    
-    let data = res.data;
-
-    // 5. Apply Route Filtering on the client side since /invoices handles shops, not raw RouteId filtering
-    if (routeId) {
-      // (Your MapInvoice helper populates routeName, so we can check if it matches)
-      const selectedRouteName = routes?.find((r: any) => r.id.toString() === routeId)?.name;
-      if (selectedRouteName) {
-        data = data.filter((c: any) => c.routeName === selectedRouteName);
-      }
-    }
-
-    // 6. Client-side aging logic calculation buffer
-    if (agingMonths !== undefined) {
-      const today = new Date();
-      data = data.filter((c: any) => {
-        const invDate = new Date(c.date);
-        const diffTime = Math.abs(today.getTime() - invDate.getTime());
-        const diffMonths = diffTime / (1000 * 60 * 60 * 24 * 30.44); // Average month length
-        return diffMonths >= agingMonths;
-      });
-    }
-
-    return data;
-  },
-  // Ensure routes dropdown is loaded before running the route-name filter match
-  enabled: true 
-});
 
   return (
     <div className="space-y-6">
@@ -151,8 +109,8 @@ export default function Invoices() {
                 <tr key={inv.id} className="hover:bg-gray-50 transition">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(inv.date)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{inv.number}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{inv.shop_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">{formatCurrency(inv.total_amount)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{inv.shopName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">{formatCurrency(inv.totalAmount)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-red-600 font-bold">{formatCurrency(inv.due)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <span className={cn(
