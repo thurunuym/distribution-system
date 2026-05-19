@@ -92,14 +92,13 @@ export default function Credits() {
                     <tr key={c.id} className="hover:bg-blue-50 transition-colors">
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(c.date)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-blue-600">{c.number}</td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{c.shop_name}</td>
-                      <td className="px-4 py-4 whitespace-nowrap text-xs text-gray-500">
+                      <td className="px-4 py-4 text-sm text-gray-900 font-medium">{c.shopName}</td>                      <td className="px-4 py-4 whitespace-nowrap text-xs text-gray-500">
                         <span className="flex items-center">
                             <MapPin className="w-3 h-3 mr-1 text-gray-300" />
-                            {c.route_name}
+                            {c.routeName}
                         </span>
                       </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-sm text-right text-gray-500">{formatCurrency(c.total_amount)}</td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-right text-gray-500">{formatCurrency(c.totalAmount)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-right text-red-600 font-bold">{formatCurrency(c.due)}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-center">
                         <Link to={`/invoices/${c.id}`} className="text-gray-400 hover:text-blue-600">

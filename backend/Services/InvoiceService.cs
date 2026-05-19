@@ -113,9 +113,9 @@ public class InvoiceService(AppDbContext db)
         );
     }
 
-    private static InvoiceResponse MapInvoice(Invoice inv) => new(
+    public static InvoiceResponse MapInvoice(Invoice inv) => new(
         inv.Id, inv.Number, inv.ShopId,
-        inv.Shop?.Name ?? "", inv.Shop?.Route?.Name ?? "",
+        inv.Shop?.Name ?? "", inv.Shop?.Route?.Name ?? "",        
         inv.Date, inv.TotalAmount, inv.Paid, inv.Due,
         inv.Status, inv.Remarks, inv.UpdatedAt,
         inv.Payments.Select(p => new PaymentResponse(p.Id, p.Amount, p.Type, p.Date, p.ChequeId)).ToList(),
