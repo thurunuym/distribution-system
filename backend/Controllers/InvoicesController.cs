@@ -8,7 +8,7 @@ namespace DistributionApi.Controllers;
 
 /// <summary>Manages invoices.</summary>
 [ApiController]
-[Route("api/invoices")]
+[Route("api/invoices")]             //base URL
 public class InvoicesController(InvoiceService svc, AppDbContext db) : ControllerBase
 {
     /// <summary>Returns invoices with optional filters.</summary>

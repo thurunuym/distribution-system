@@ -97,7 +97,7 @@ export default function NewInvoice() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['summary'] });
       queryClient.invalidateQueries({ queryKey: ['recentInvoices'] });
-      navigate('/');
+      navigate('/invoices');
     },
     onError: (error: any) => {
       setSubmitError(error.response?.data?.detail || 'Failed to save invoice');
