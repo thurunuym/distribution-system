@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -22,14 +22,137 @@ const createChequePayment = () => ({
   }
 });
 
+interface Option {
+  value: string | number;
+  label: string;
+}
+
+function SearchableSelect({
+  label,
+  options,
+  value,
+  onChange,
+  placeholder,
+  error,
+  disabled = false,
+}: {
+  label: string;
+  options: Option[];
+  value: string | number;
+  onChange: (value: any) => void;
+  placeholder: string;
+  error?: string;
+  disabled?: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(o => o.value === value);
+
+  const filteredOptions = options.filter(o =>
+    o.label.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
+  const displayedOptions = filteredOptions.slice(0, 100);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+    setSearch('');
+  };
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <div className="mt-1 relative">
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={toggleDropdown}
+          className="w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-50 min-h-[38px] flex items-center justify-between"
+        >
+          <span className="block truncate">
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+          <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+            <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+              <path d="M7 7l3-3 3 3m0 6l-3 3-3-3" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </button>
+
+        {isOpen && (
+          <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg border border-gray-200">
+            <div className="p-2 border-b border-gray-100 sticky top-0 bg-white z-10">
+              <input
+                type="text"
+                className="w-full p-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Type to search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <ul className="max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+              {displayedOptions.length === 0 ? (
+                <li className="text-gray-500 select-none relative py-2 pl-3 pr-9">
+                  No options found
+                </li>
+              ) : (
+                displayedOptions.map((opt) => (
+                  <li
+                    key={opt.value}
+                    onClick={() => {
+                      onChange(opt.value);
+                      setIsOpen(false);
+                      setSearch('');
+                    }}
+                    className={`cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-600 hover:text-white transition-colors ${
+                      opt.value === value ? 'bg-blue-50 text-blue-900 font-semibold' : 'text-gray-900'
+                    }`}
+                  >
+                    <span className="block truncate">{opt.label}</span>
+                  </li>
+                ))
+              )}
+              {filteredOptions.length > 100 && (
+                <li className="text-xs text-gray-400 select-none py-2 text-center bg-gray-50 border-t sticky bottom-0">
+                  Showing first 100 of {filteredOptions.length} results. Type to refine your search.
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+      </div>
+      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+    </div>
+  );
+}
+
 export default function NewInvoice() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<number | ''>('');
 
   const { data: shops } = useQuery({
     queryKey: ['shops'],
     queryFn: async () => (await api.get('/shops')).data
+  });
+
+  const { data: routes } = useQuery({
+    queryKey: ['routes'],
+    queryFn: async () => (await api.get('/routes')).data
   });
 
   const {
@@ -62,6 +185,22 @@ export default function NewInvoice() {
   const chequePayments = (payments ?? []).slice(1);
   const chequeTotal = chequePayments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
   const creditAmount = Math.max(0, totalAmount - (cashAmount + chequeTotal));
+
+  const selectedShopId = watch('shopId');
+
+  const routeOptions = [
+    { value: '', label: 'All Routes' },
+    ...(routes?.map((r: any) => ({ value: r.id, label: r.name })) || [])
+  ];
+
+  const filteredShops = shops?.filter((shop: any) => {
+    return !selectedRouteId || shop.routeId === selectedRouteId;
+  });
+
+  const shopOptions = filteredShops?.map((shop: any) => ({
+    value: shop.id,
+    label: `${shop.name} (${shop.routeName})`
+  })) || [];
 
   const mutation = useMutation({
     mutationFn: async (data: InvoiceCreate) => {
@@ -155,25 +294,39 @@ export default function NewInvoice() {
               {errors.number && <p className="mt-1 text-sm text-red-600">{errors.number.message}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Shop</label>
-              <select
-                {...register('shopId', { valueAsNumber: true })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
-              >
-                <option value={0}>Select a shop</option>
-                {shops?.map((shop: any) => (
-                  <option key={shop.id} value={shop.id}>{shop.name} ({shop.route_name})</option>
-                ))}
-              </select>
-              {errors.shopId && <p className="mt-1 text-sm text-red-600">{errors.shopId.message}</p>}
-            </div>
-            <div>
               <label className="block text-sm font-medium text-gray-700">Date</label>
               <input
                 type="date"
                 {...register('date')}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
               />
+            </div>
+            <div>
+              <SearchableSelect
+                label="Filter by Route"
+                placeholder="All Routes"
+                options={routeOptions}
+                value={selectedRouteId}
+                onChange={(val) => {
+                  setSelectedRouteId(val);
+                  // When route changes, if the currently selected shop is not in the new route, clear it
+                  const currentShop = shops?.find((s: any) => s.id === selectedShopId);
+                  if (val && currentShop && currentShop.routeId !== val) {
+                    setValue('shopId', 0, { shouldValidate: true });
+                  }
+                }}
+              />
+            </div>
+            <div>
+              <SearchableSelect
+                label="Shop"
+                placeholder="Select a shop"
+                options={shopOptions}
+                value={selectedShopId}
+                onChange={(val) => setValue('shopId', val, { shouldValidate: true })}
+                error={errors.shopId?.message}
+              />
+              <input type="hidden" {...register('shopId', { valueAsNumber: true })} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Total Amount (LKR)</label>

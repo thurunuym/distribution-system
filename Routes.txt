@@ -1,0 +1,54 @@
+Routes :
+
+1. Akurana, Alawathugoda.
+2. Ambathanna, Poojapitiya.
+3. Aruppola, Manikhinna, Sirimalwatha.
+4. Galaha, Delthota.
+5. Gampola Town.
+6. Gelioya, Wellambada, Waligalla.
+7. Gohagoda, Katugasthota.
+8. Hanguranketha, Rikillagaskada.
+9. Henawella, Danture, Kadugannawa.
+10. Kandy Town.
+11. Kengalla, Digana.
+12. Kiribathkumbura, Pilimathalawa.
+13. Madawala, Bokkawela.
+14. Madawala, Wattegama.
+15. Marassan, Gurudeniya.
+16. Nawalapitiya Town.
+17. Nawayalathanna, Jambugahapitiya, Doragamuwa.
+18. Oruthota, Theldeniya.
+19. Panideniya, Dawulagala, Buwalikada.
+20. Peradeniya, Gannoruwa, Muruthalawa.
+21. Pussallawa Town.
+22. Thalathuoya, Ampitiya.
+23. Thalwatha, Thannekumbura, Kundasale.
+24. Warallagama, Aladeniya.
+
+
+[
+  "Akurana, Alawathugoda.",
+  "Ambathanna, Poojapitiya.",
+  "Aruppola, Manikhinna, Sirimalwatha.",
+  "Galaha, Delthota.",
+  "Gampola Town.",
+  "Gelioya, Wellambada, Waligalla.",
+  "Gohagoda, Katugasthota.",
+  "Hanguranketha, Rikillagaskada.",
+  "Henawella, Danture, Kadugannawa.",
+  "Kandy Town.",
+  "Kengalla, Digana.",
+  "Kiribathkumbura, Pilimathalawa.",
+  "Madawala, Bokkawela.",
+  "Madawala, Wattegama.",
+  "Marassan, Gurudeniya.",
+  "Nawalapitiya Town.",
+  "Nawayalathanna, Jambugahapitiya, Doragamuwa.",
+  "Oruthota, Theldeniya.",
+  "Panideniya, Dawulagala, Buwalikada.",
+  "Peradeniya, Gannoruwa, Muruthalawa.",
+  "Pussallawa Town.",
+  "Thalathuoya, Ampitiya.",
+  "Thalwatha, Thannekumbura, Kundasale.",
+  "Warallagama, Aladeniya."
+]

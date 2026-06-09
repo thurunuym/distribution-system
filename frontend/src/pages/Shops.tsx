@@ -1,12 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import api from '../lib/axios.ts';
-import { Store, MapPin, Plus, Loader2 } from 'lucide-react';
+import { Store, MapPin, Plus, Loader2, Search, X } from 'lucide-react';
 
 export default function Shops() {
   const queryClient = useQueryClient();
   const [showAdd, setShowAdd] = useState(false);
   const [formData, setFormData] = useState({ name: '', address: '', routeId: '' });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRouteId, setSelectedRouteId] = useState('');
 
   const { data: shops, isLoading } = useQuery({
     queryKey: ['shops'],
@@ -27,10 +29,34 @@ export default function Shops() {
     }
   });
 
+  const filteredShops = shops?.filter((shop: any) => {
+    const matchesSearch = !searchQuery || 
+      shop.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      (shop.address && shop.address.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesRoute = !selectedRouteId || shop.routeId === parseInt(selectedRouteId);
+    
+    return matchesSearch && matchesRoute;
+  });
+
+  const hasActiveFilters = searchQuery !== '' || selectedRouteId !== '';
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    setSelectedRouteId('');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Manage Shops</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Manage Shops</h1>
+          {!isLoading && shops && (
+            <p className="text-xs text-gray-500 mt-1">
+              Showing {filteredShops?.length || 0} of {shops.length} shops
+            </p>
+          )}
+        </div>
         <button
           onClick={() => setShowAdd(!showAdd)}
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
@@ -87,11 +113,48 @@ export default function Shops() {
         </div>
       )}
 
+      {/* Filters & Search */}
+      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search shops by name or address..."
+            className="pl-9 pr-4 py-2 w-full border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="flex w-full sm:w-auto gap-3 items-center">
+          <div className="w-full sm:w-64">
+            <select
+              className="w-full p-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              value={selectedRouteId}
+              onChange={(e) => setSelectedRouteId(e.target.value)}
+            >
+              <option value="">All Routes</option>
+              {routes?.map((r: any) => (
+                <option key={r.id} value={r.id}>{r.name}</option>
+              ))}
+            </select>
+          </div>
+          {hasActiveFilters && (
+            <button
+              onClick={handleResetFilters}
+              className="inline-flex items-center px-3 py-2 border border-gray-200 text-gray-500 rounded-md text-sm font-medium hover:bg-gray-50 hover:text-gray-700 transition"
+              title="Reset Filters"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {isLoading ? (
           [1, 2, 3].map(i => <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse" />)
-        ) : (
-          shops?.map((shop: any) => (
+        ) : filteredShops && filteredShops.length > 0 ? (
+          filteredShops.map((shop: any) => (
             <div key={shop.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition group">
               <div className="flex items-start justify-between">
                 <div className="flex items-center">
@@ -102,7 +165,7 @@ export default function Shops() {
                     <h3 className="text-sm font-bold text-gray-900">{shop.name}</h3>
                     <div className="flex items-center text-xs text-gray-500 mt-1">
                       <MapPin className="w-3 h-3 mr-1" />
-                      {shop.route_name}
+                      {shop.routeName}
                     </div>
                   </div>
                 </div>
@@ -114,6 +177,10 @@ export default function Shops() {
               )}
             </div>
           ))
+        ) : (
+          <div className="col-span-full py-12 text-center text-gray-500 bg-white border border-dashed rounded-lg">
+            No shops found matching your search.
+          </div>
         )}
       </div>
     </div>

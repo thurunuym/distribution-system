@@ -10,7 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ─── Database ──────────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        npgsql => npgsql.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorCodesToAdd: null
+        )
+    ));
 
 // ─── Services ─────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<InvoiceService>();
